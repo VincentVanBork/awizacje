@@ -3,12 +3,12 @@ ARG EXPOSED_PORT=$USER_SERVICE_PORT
 EXPOSE ${EXPOSED_PORT}
 WORKDIR /app
 COPY . ./
-
 RUN go mod download
-
-COPY *.go ./
 RUN go build -o ./user-service
 
 FROM alpine
-COPY --from=builder /app/user-service .
+WORKDIR app
+COPY --from=builder /app/user-service ./user-service
+COPY --from=builder /app/models/migrations ./migrations
+
 CMD ["/user-service"]
