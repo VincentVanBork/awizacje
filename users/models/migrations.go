@@ -15,7 +15,7 @@ func Migrate(db *sql.DB) error {
 		return startupErr
 	}
 	m, setupErr := migrate.NewWithDatabaseInstance(
-		"file:///migrations",
+		os.Getenv("MIGRATIONS_PATH"),
 		os.Getenv("POSTGRES_DB"), driver)
 	if setupErr != nil {
 		return setupErr

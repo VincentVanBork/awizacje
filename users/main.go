@@ -3,8 +3,10 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/golang-migrate/migrate/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	_ "github.com/lib/pq"
 	"os"
 	"users/controllers"
 	"users/models"
@@ -15,14 +17,20 @@ func main() {
 	// Echo instance
 	e := echo.New()
 	// db and migrations
-	dbConnect := fmt.Sprintf("postgres://%s@%s:5432/%s",
+	dbConnect := fmt.Sprintf("postgres://%s:%s@%s:5432/%s?sslmode=disable",
 		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
 		os.Getenv("POSTGRES_ADDRESS"),
 		os.Getenv("POSTGRES_DB"))
-	db, err := sql.Open("postgres", dbConnect)
-	e.Logger.Fatal(err)
+	fmt.Println(dbConnect)
+	db, sqlErr := sql.Open("postgres", dbConnect)
+	if sqlErr != nil {
+		e.Logger.Fatal(sqlErr)
+	}
 	migrateErr := models.Migrate(db)
-	e.Logger.Fatal(migrateErr)
+	if migrateErr != nil && migrateErr != migrate.ErrNoChange {
+		e.Logger.Fatal(migrateErr)
+	}
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())

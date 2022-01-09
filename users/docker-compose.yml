@@ -10,8 +10,17 @@ services:
       - $DB_USERS_HOST_PORT:5432
     volumes:
       - user_repository:/var/lib/postgresql/data
+    env_file: .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_PASSWORD" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   user-auth:
+    depends_on:
+      db-users:
+        condition: service_healthy
     image: user-auth-awizacje
     build:
       context: ./

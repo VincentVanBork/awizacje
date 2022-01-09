@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL unique,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
-    password VARCHAR ( 50 ) NOT NULL,
+    password VARCHAR (255) NOT NULL,
     deleted_at TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

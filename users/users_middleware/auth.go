@@ -3,6 +3,7 @@ package users_middleware
 import (
 	"database/sql"
 	"github.com/labstack/echo/v4"
+	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 )
@@ -15,9 +16,9 @@ func (m *DBMiddleware) Login(username, password string, c echo.Context) (bool, e
 	return m.AuthUser(username, password)
 }
 
-// TODO: move this repository to some structs and use composition
+// AuthUser TODO: move this repository to some structs and use composition
 func (m *DBMiddleware) AuthUser(email string, password string) (bool, error) {
-	rows, queryErr := m.Repository.Query("SELECT * FROM users WHERE email = $e", email)
+	rows, queryErr := m.Repository.Query("SELECT * FROM users WHERE email=$1", email)
 	if queryErr != nil {
 		return false, queryErr
 	}
